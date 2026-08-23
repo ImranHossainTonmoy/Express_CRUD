@@ -16,7 +16,6 @@ let todos: {
 app.post("/todos", (req, res) => {
     const { title, completed } = req.body;
 
-
     if (!title || title.trim() === "") {
         return res.status(400).json({
             message: "Title is required"
@@ -41,7 +40,6 @@ app.get("/todos", (req, res) => {
 
 app.get("/todos/:id", (req, res) => {
     const { id } = req.params;
-
     const todo = todos.find((todo) => todo.id === id);
 
     if (!todo) {
@@ -104,21 +102,25 @@ app.delete("/todos/:id", (req, res) => {
 });
 
 
-app.get("/todos/completed", (req, res) => {
-    const completedTodos = todos.filter(
-        (todo) => todo.completed === true
-    );
-    res.status(200).json(completedTodos);
+app.get("/todos/filter/:status", (req, res) => {
+  const status = req.params.status;
+
+  if (status === "completed") {
+    const completedTodos = todos.filter((todo) => todo.completed === true);
+
+    return res.status(200).json(completedTodos);
+  }
+
+  if (status === "incomplete") {
+    const incompleteTodos = todos.filter((todo) => todo.completed === false);
+
+    return res.status(200).json(incompleteTodos);
+  }
+
+  res.status(400).json({
+    message: "Use completed or incomplete",
+  });
 });
-
-
-app.get("/todos/incomplete", (req, res) => {
-    const incompleteTodos = todos.filter(
-        (todo) => todo.completed === false
-    );
-    res.status(200).json(incompleteTodos);
-});
-
 
 
 app.listen(process.env.PORT, ()=> {
